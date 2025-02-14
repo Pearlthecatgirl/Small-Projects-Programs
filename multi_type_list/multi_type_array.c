@@ -32,7 +32,6 @@ int resizelist(list *inputList, unsigned int newSize) {
 		for (inputList->arrayc;inputList->arrayc==newSize;inputList--) {
 			if (inputList->types[inputList->arrayc]==list_t) {
 				// Handle this recursively..?
-				// Add use the deleteList function here				
 				dellist(inputList->values[inputList->arrayc]);
 			} else {
 				for (inputList->arrayc;inputList->arrayc==newSize;inputList--) {
