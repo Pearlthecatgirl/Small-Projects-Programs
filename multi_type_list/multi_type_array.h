@@ -4,11 +4,7 @@
 #include <errno.h>
 #include <string.h>
 
-typedef struct multi_type_list_t list;
-
-struct multi_type_list_t
-{
-	enum valid_list_types {
+enum valid_list_types {
 		int_t, 
 		short_t,
 		float_t,
@@ -16,11 +12,32 @@ struct multi_type_list_t
 		string_t, // String = char *
 		list_t,
 		empty_t,
-	} *types; // Use this to typecast
-	int arrayc; // number of elements per array
+}; // Use this to typecast
+
+typedef struct multi_type_list_t list;
+typedef enum valid_list_types list_vt;
+
+struct multi_type_list_t
+{
+	unsigned int arrayc; // number of elements per array
+	list_vt *types;
 	void **values;
 
 };
 
-list *newlist(int element_c);
+
+void appendlist(list *inputList, void *value, list_vt type);
+void dellist(list *inputList);
+list *newlist(unsigned int element_c);
 int resizelist(list *inputList, unsigned int newSize);
+
+
+
+
+
+
+
+
+
+
+
