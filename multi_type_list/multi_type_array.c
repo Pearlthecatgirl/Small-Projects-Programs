@@ -5,11 +5,23 @@
 
 #include "./multi_type_array.h"
 
-
 void appendlist(list *inputList, void *value, list_vt type) {
-	inputList->types[inputList->arrayc]=type;
-	inputList->values[inputList->arrayc++]=value;
+
 }
+
+//void appendlist(list *inputList, void *value, list_vt type) {
+//	inputList->arrayc++;
+//	list_vt *realloc_res_type=realloc(inputList->types, sizeof(enum valid_list_types)*inputList->arrayc);
+//	if (!realloc_res_type) CRASH(ENOMEM);
+//	inputList->types=realloc_res_type;
+//
+//	void **realloc_res_val=realloc(inputList->types,sizeof(void *)*inputList->arrayc);
+//	if (!realloc_res_val) CRASH(ENOMEM);
+//	inputList->values=realloc_res_val;
+//
+//	inputList->types[inputList->arrayc]=type;
+//	inputList->values[inputList->arrayc]=value;
+//}
 
 // Return code
 void dellist(list *inputList) {
@@ -25,11 +37,12 @@ void dellist(list *inputList) {
 }
 
 list *newlist(unsigned int element_c) {
-	if (element_c<1) return NULL;
 	static struct multi_type_list_t output;
-	output.arrayc=element_c;
 	output.types=malloc(sizeof(enum valid_list_types)*element_c);
+	if (!output.types) CRASH(ENOMEM);
 	output.values=malloc(sizeof(void *)*element_c);
+	if (!output.values) CRASH(ENOMEM);
+	for (int i=0;i<element_c;i++) output.types[i]=empty_t;
 	return &output;
 }
 
@@ -58,6 +71,8 @@ int resizelist(list *inputList, unsigned int newSize) {
 #ifdef UNIT_TEST
 int main(void) {
 	list *l1=newlist(5);
+	for (int i=0;i<5;i++) printf("%d\n", l1->types[i]);
+	
 	return 0;
 }
 #endif
