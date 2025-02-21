@@ -5,26 +5,36 @@
 
 #include "./multi_type_array.h"
 
-void _append_list(list *inputList, void *value, list_vt type) { 
-	// Dupe code from resizing up. Since function calls are wasted over, head here we are
-	resizelist(inputList, inputList->arrayc+1);
+void _list_append(list *inputList, void *value, list_vt type) { 
+	list_resize(inputList, inputList->arrayc+1);
 	inputList->values[inputList->arrayc-1]=value;
 	inputList->types[inputList->arrayc-1]=type;
 }
 
 // This is challenging.... TODO
-void insertlist(list *inputList, void *value, list_vt type, unsigned int elementn) {
-	// Elementn refers to element location. Array starts at 0
-	if ((elementn)>inputList->arrayc-1) {
-		// Call resize here...
-	}
+void _element_insert_single(list *inputList, void *value, list_vt type, unsigned int element_n) {
+	// Arrayc is the count of elements, element_n is the nth position (starts at 0)
+	unsigned int element_c=element_n+1;
+	if (element_c>inputList->arrayc) {
+		// Resize and then shuffle everything up 1
+		list_resize(inputList, inputList->arrayc+1);
+		// arrayc-1 should be empty.. move from arrayc-2 to arrayc-1
+		for (int i=inputList->arrayc-2;i>element_n;i--) {
+			inputList->values[i+1]=inputList->values[i];
+			inputList->types[i+1]=inputList->types[i];
+		} 
+		inputList->types[element_n]=type;
+		inputList->values[element_n]=value;
+	} else if (element_c<inputList->arrayc) {
+	
+	} else _list_append(inputList, (void *)value, type); // If it is placed at this position, its the same as an append
 }
 
 // Might need a code review...
-void dellist(list *inputList) {
+void list_del(list *inputList) {
 	for (;inputList->arrayc>=0;inputList--) {
 		if (inputList->types[inputList->arrayc]==list_t) {
-			dellist(inputList->values[inputList->arrayc]);
+			list_del(inputList->values[inputList->arrayc]);
 		} else {
 			free(inputList->values[inputList->arrayc]);
 			inputList->types[inputList->arrayc]=empty_t;
@@ -35,7 +45,7 @@ void dellist(list *inputList) {
 	free(inputList);
 }
 
-list *newlist(unsigned int element_c) {
+list *list_create(unsigned int element_c) {
 	static struct multi_type_list_t output;
 	output.types=malloc(sizeof(enum valid_list_types)*element_c);
 	if (!output.types) CRASH(ENOMEM);
@@ -45,7 +55,7 @@ list *newlist(unsigned int element_c) {
 	return &output;
 }
 
-int resizelist(list *inputList, unsigned int newSize) {
+int list_resize(list *inputList, unsigned int newSize) {
 	if (newSize!=inputList->arrayc) {
 		// If scaling down: free and then realloc to get the memory back
 		if (newSize<inputList->arrayc) {
@@ -54,8 +64,7 @@ int resizelist(list *inputList, unsigned int newSize) {
 				if (inputList->types[inputList->arrayc-1]!=list_t) {
 					free(inputList->values[inputList->arrayc]);
 				} else {
-					// Dupe code from dellist. No overhead from calling another function!
-					dellist(inputList->values[i]);
+					list_del(inputList->values[i]);
 				}
 			}
 		} 
@@ -77,17 +86,40 @@ int resizelist(list *inputList, unsigned int newSize) {
 
 #ifdef UNIT_TEST
 int main(void) {
-	list *l1=newlist(0);
-	char char1='%'; 
-	char *str1="abcd";
-	_append_list(l1, (void *)&char1, char_t);
-	_append_list(l1, (void *)&str1, string_t);
+	//list *l1=list_create(0);
+	//list *l2=list_create(0);
+	//char char1='%'; 
+	//char char2='*';
+	//char *str1="abcd";
+	//char *str2="bcde";
+	//appendlist(l1, str1, char_t);
+	//appendlist(l2, str2, char_t);
 
-	void **testv=malloc(sizeof(void *)*2);
-	//testv[0]=(void *)&char1;
-	//testv[1]=(void *)&str1;
-	fprintf(stdout, "%c\n", *(char*)l1->values[0]);
-	fprintf(stdout, "%s\n", *(char **)l1->values[1]);
+	////_list_append(l1, (void *)&l2, list_t);
+	//appendlist(l1, l2, list_t);
+	////_element_insert_single(l1, (void *)&str1, string_t, 1);
+
+	//fprintf(stdout, "%s\n", *(char **)l1->values[0]);
+	//fprintf(stdout, "%s\n", *(char **)l2->values[0]);
+	//fprintf(stdout, "%s\n", *(char **)(*(list **)l1->values[1])->values[0]);
+
+
+	list *l1=list_create(0);
+	list *l2=list_create(0);
+	char *str0="abcd";
+	char *str1="efgh";
+	//appendlist(l1, str0, string_t);
+	//appendlist(l2, str0, string_t);
+	//appendlist(l1, l2, list_t);
+	l1->values[0]=(void *)&str0;
+	l2->values[0]=(void *)&str1;
+	l1->values[1]=(void *)&l2;
+	fprintf(stdout, "%p\n", (char **)l1->values[0]);
+	fprintf(stdout, "%p\n", &str0);
+	fprintf(stdout, "%p\n", &str1);
+	fprintf(stdout, "%p\n", (char **)l1->values[0]);
+	fprintf(stdout, "%p\n", (char **)l2->values[0]);
+	fprintf(stdout, "%p\n", (char **)(*(list **)l1->values[1])->values[0]);
 
 	return 0;
 }

@@ -32,14 +32,13 @@ struct multi_type_list_t {
 };
 
 // Internal Functions
-void _append_list(list *inputList, void *value, list_vt type);
-void dellist(list *inputList);
-void insertlist(list *inputList, void *value, list_vt type, unsigned int elementn);
-list *newlist(unsigned int element_c);
-int resizelist(list *inputList, unsigned int newSize);
+void _element_insert(list *inputList, void *value, list_vt type, unsigned int element_n);
+void _list_append(list *inputList, void *value, list_vt type);
+list *list_create(unsigned int element_c);
+void list_del(list *inputList);
+int list_resize(list *inputList, unsigned int newSize);
 
-#define appendList(INPUT, VALUE, TYPE) _append_list(INPUT, (void *)&VALUE, TYPE)
-#define newList(ELEMENT_COUNT) newlist(ELEMENT_COUNT)
+#define appendlist(LIST, VALUE, TYPE) _list_append(LIST, (void *)&VALUE, TYPE)
 
 
 
