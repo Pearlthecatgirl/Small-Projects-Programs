@@ -1,0 +1,7 @@
+#!/bin/sh
+browser_search_link=https://start.duckduckgo.com/lite/?q=
+browser_cmd=links
+
+res=$(echo "$@" | awk -F' ' '{ sub(/ /,"+"); print $1}')
+link=$browser_search_link+$res
+$browser_cmd $link
